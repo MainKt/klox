@@ -45,6 +45,7 @@ class Scanner(private val source: String) {
 
             '/' -> when {
                 match('/') -> while (peek() != '\n' && !isAtEnd()) advance()
+                match('*') -> blockComment()
                 else -> addToken(TokenType.SLASH)
             }
 
@@ -61,6 +62,22 @@ class Scanner(private val source: String) {
                 else -> error(line, "Unexpected character.")
             }
         }
+    }
+
+    private fun blockComment() {
+        while (!(peek() == '*' && peekNext() == '/' || isAtEnd())) {
+            if (peek() == '\n') line++
+            advance()
+        }
+
+        if (isAtEnd()) {
+            error(line, "Unterminated comment.")
+            return
+        }
+
+        // Escape the closing */.
+        advance()
+        advance()
     }
 
     private fun identifier() {
