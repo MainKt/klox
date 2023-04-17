@@ -65,8 +65,14 @@ class Scanner(private val source: String) {
     }
 
     private fun blockComment() {
-        while (!(peek() == '*' && peekNext() == '/' || isAtEnd())) {
+        var nesting = 1
+
+        while (nesting != 0 && !isAtEnd()) {
+            if (peek() == '/' && peekNext() == '*') nesting++
+            if (peek() == '*' && peekNext() == '/') nesting--
+
             if (peek() == '\n') line++
+
             advance()
         }
 
@@ -75,8 +81,7 @@ class Scanner(private val source: String) {
             return
         }
 
-        // Escape the closing */.
-        advance()
+        // Escape the ending /.
         advance()
     }
 
